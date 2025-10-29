@@ -5,3 +5,5 @@ scikit-fuzzy
 packaging
 matplotlib
 networkx
+fastapi
+uvicorn
