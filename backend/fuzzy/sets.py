@@ -33,7 +33,7 @@ urgency: Dict[str, Callable[[float], float]] = {
 
 # Output representative crisp values
 duration_values: Dict[str, float] = {
-    "short":    20.0,
-    "moderate": 45.0,
-    "long":     70.0,
+    "short":    25.0,
+    "moderate": 50.0,
+    "long":     90.0,
 }
