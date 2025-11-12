@@ -18,9 +18,9 @@ export function evaluate(inputs: Inputs): number {
   }
 
   // --- Urgency memberships ---
-  const u_low = sets.urgency.low(inputs.urgency);
-  const u_med = sets.urgency.medium(inputs.urgency);
-  const u_high = sets.urgency.high(inputs.urgency);
+  const u_low = sets.taskPriority.low(inputs.taskPriority);
+  const u_med = sets.taskPriority.medium(inputs.taskPriority);
+  const u_high = sets.taskPriority.high(inputs.taskPriority);
 
   // --- Urgency modifiers ---
   // Enforce monotonicity: low urgency → shorter, high urgency → longer
@@ -39,23 +39,41 @@ export function evaluate(inputs: Inputs): number {
   let denominator = 0.0;
 
   for (const [label, strengths] of Object.entries(buckets)) {
-    const mod = label_mod[label as keyof typeof label_mod];
-    for (const s of strengths) {
-      const w = s * mod;
-      numerator +=
-        sets.duration_values[label as keyof typeof sets.duration_values] * w;
-      denominator += w;
+    const crispValue =
+      sets.duration_values[label as keyof typeof sets.duration_values];
+    for (const strength of strengths) {
+      numerator += strength * crispValue; // Weighted contribution
+      denominator += strength; // Total weight
     }
   }
 
+  // Debugging: Log buckets and label_mod to verify calculations
+  console.log("Buckets:", buckets);
+  console.log("Label Modifiers:", label_mod);
+
+  // Debugging: Log inputs and membership function outputs
+  console.log("Inputs:", inputs);
+  console.log("Task Complexity Memberships:", {
+    low: sets.taskComplexity.low(inputs.taskComplexity),
+    medium: sets.taskComplexity.medium(inputs.taskComplexity),
+    high: sets.taskComplexity.high(inputs.taskComplexity),
+  });
+  console.log("Energy Level Memberships:", {
+    low: sets.energyLevel.low(inputs.energyLevel),
+    medium: sets.energyLevel.medium(inputs.energyLevel),
+    high: sets.energyLevel.high(inputs.energyLevel),
+  });
+  console.log("Task Priority Memberships:", {
+    low: sets.taskPriority.low(inputs.taskPriority),
+    medium: sets.taskPriority.medium(inputs.taskPriority),
+    high: sets.taskPriority.high(inputs.taskPriority),
+  });
+
   if (denominator === 0.0) {
-    return sets.duration_values.moderate;
+    console.warn("No rules activated. Returning default value.");
+    return sets.duration_values.moderate; // Default value
   }
 
-  let result = numerator / denominator;
-
-  // --- Feasibility cap ---
-  result = Math.min(result, inputs.time);
-
+  const result = numerator / denominator; // Weighted average
   return Math.round(result * 100) / 100;
 }

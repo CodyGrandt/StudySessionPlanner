@@ -8,28 +8,29 @@ function trimf(a: number, b: number, c: number): (x: number) => number {
   };
 }
 
-// Input fuzzy sets with broader overlap
-export const energy = {
-  low: trimf(0, 0, 60),
-  medium: trimf(30, 50, 80),
-  high: trimf(60, 100, 100),
+// Expanded ranges for taskComplexity, focusLevel, and taskPriority to ensure proper coverage
+export const taskComplexity = {
+  low: trimf(0, 3, 6), // Expanded range for low complexity
+  medium: trimf(5, 7, 9), // Expanded range for medium complexity
+  high: trimf(8, 10, 12), // Expanded range for high complexity
 };
 
-export const time = {
-  short: trimf(0, 0, 60),
-  moderate: trimf(30, 60, 90),
-  long: trimf(60, 120, 120),
+// Adjusted focusLevel membership function ranges to align with expected input values
+export const energyLevel = {
+  low: trimf(0, 25, 50), // Adjusted range for low focus
+  medium: trimf(40, 60, 80), // Adjusted range for medium focus
+  high: trimf(70, 90, 110), // Expanded range for high focus
 };
 
-export const urgency = {
-  low: trimf(0, 0, 5),
-  medium: trimf(2, 5, 8),
-  high: trimf(5, 10, 10),
+export const taskPriority = {
+  low: trimf(0, 3, 6), // Expanded range for low priority
+  medium: trimf(5, 7, 9), // Expanded range for medium priority
+  high: trimf(8, 10, 12), // Expanded range for high priority
 };
 
 // Output representative crisp values
 export const duration_values = {
-  short: 20.0,
-  moderate: 45.0,
-  long: 70.0,
+  short: 0.0,
+  moderate: 35.0,
+  long: 300.0,
 };

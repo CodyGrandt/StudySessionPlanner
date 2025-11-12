@@ -12,23 +12,27 @@ import {
 import { evaluate } from "./fuzzy/engine";
 
 function App() {
-  const [energy, setEnergy] = useState(50);
-  const [time, setTime] = useState(60);
-  const [urgency, setUrgency] = useState(5);
+  const [taskComplexity, setTaskComplexity] = useState(5);
+  const [energyLevel, setEnergyLevel] = useState(50);
+  const [taskPriority, setTaskPriority] = useState(5);
   const [result, setResult] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleEnergy = (_: Event, val: number | number[]) =>
-    setEnergy(val as number);
-  const handleTime = (_: Event, val: number | number[]) =>
-    setTime(val as number);
-  const handleUrgency = (_: Event, val: number | number[]) =>
-    setUrgency(val as number);
+  const handleTaskComplexity = (_: Event, val: number | number[]) =>
+    setTaskComplexity(val as number);
+  const handleEnergyLevel = (_: Event, val: number | number[]) =>
+    setEnergyLevel(val as number);
+  const handleTaskPriority = (_: Event, val: number | number[]) =>
+    setTaskPriority(val as number);
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const recommendation = evaluate({ energy, time, urgency });
+      const recommendation = evaluate({
+        taskComplexity,
+        energyLevel: energyLevel,
+        taskPriority,
+      });
       setResult(recommendation);
     } catch (err) {
       console.error("Error evaluating recommendation:", err);
@@ -68,34 +72,36 @@ function App() {
               gutterBottom
               sx={{ mb: 3 }}
             >
-              Adjust your energy, available time, and urgency to get a
-              personalized recommendation.
+              Adjust your task complexity, energy level, and task priority to
+              get a personalized recommendation.
             </Typography>
 
-            <Typography gutterBottom>Energy: {energy}</Typography>
+            <Typography gutterBottom>
+              Task Complexity: {taskComplexity}
+            </Typography>
             <Slider
-              value={energy}
-              onChange={handleEnergy}
+              value={taskComplexity}
+              onChange={handleTaskComplexity}
+              min={0}
+              max={10}
+              valueLabelDisplay="auto"
+              sx={{ mb: 3 }}
+            />
+
+            <Typography gutterBottom>Energy Level: {energyLevel}</Typography>
+            <Slider
+              value={energyLevel}
+              onChange={handleEnergyLevel}
               min={0}
               max={100}
               valueLabelDisplay="auto"
               sx={{ mb: 3 }}
             />
 
-            <Typography gutterBottom>Available Time: {time} min</Typography>
+            <Typography gutterBottom>Task Priority: {taskPriority}</Typography>
             <Slider
-              value={time}
-              onChange={handleTime}
-              min={0}
-              max={120}
-              valueLabelDisplay="auto"
-              sx={{ mb: 3 }}
-            />
-
-            <Typography gutterBottom>Urgency: {urgency}</Typography>
-            <Slider
-              value={urgency}
-              onChange={handleUrgency}
+              value={taskPriority}
+              onChange={handleTaskPriority}
               min={0}
               max={10}
               valueLabelDisplay="auto"
