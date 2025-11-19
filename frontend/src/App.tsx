@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Card,
@@ -13,8 +13,15 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
+  LinearProgress,
 } from "@mui/material";
-import { Brightness4, Brightness7 } from "@mui/icons-material";
+import {
+  Brightness4,
+  Brightness7,
+  PlayArrow,
+  Pause,
+  Stop,
+} from "@mui/icons-material";
 import { evaluate } from "./fuzzy/engine";
 
 function App() {
@@ -27,6 +34,11 @@ function App() {
     const saved = localStorage.getItem("darkMode");
     return saved ? JSON.parse(saved) : false;
   });
+
+  // Timer states
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const theme = useMemo(
     () =>
@@ -64,6 +76,23 @@ function App() {
     });
   };
 
+  // Timer countdown effect
+  useEffect(() => {
+    if (isRunning && !isPaused && timeRemaining !== null && timeRemaining > 0) {
+      const timer = setInterval(() => {
+        setTimeRemaining((prev) => {
+          if (prev === null || prev <= 1) {
+            setIsRunning(false);
+            setIsPaused(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [isRunning, isPaused, timeRemaining]);
+
   const handleTaskComplexity = (_: Event, val: number | number[]) =>
     setTaskComplexity(val as number);
   const handleEnergyLevel = (_: Event, val: number | number[]) =>
@@ -73,6 +102,10 @@ function App() {
 
   const handleSubmit = async () => {
     setLoading(true);
+    // Reset timer when getting new recommendation
+    setTimeRemaining(null);
+    setIsRunning(false);
+    setIsPaused(false);
     try {
       const recommendation = evaluate({
         taskComplexity,
@@ -85,6 +118,34 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const startTimer = () => {
+    if (result !== null) {
+      setTimeRemaining(Math.round(result * 60)); // Convert minutes to seconds
+      setIsRunning(true);
+      setIsPaused(false);
+    }
+  };
+
+  const pauseTimer = () => {
+    setIsPaused(true);
+  };
+
+  const resumeTimer = () => {
+    setIsPaused(false);
+  };
+
+  const stopTimer = () => {
+    setTimeRemaining(null);
+    setIsRunning(false);
+    setIsPaused(false);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -185,17 +246,105 @@ function App() {
               </Button>
 
               {result !== null && !loading && (
-                <Typography
-                  variant="h6"
-                  sx={{
-                    mt: 4,
-                    textAlign: "center",
-                    color: "primary.main",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Recommended Duration: {result.toFixed(1)} minutes
-                </Typography>
+                <>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mt: 4,
+                      textAlign: "center",
+                      color: "primary.main",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Recommended Duration: {result.toFixed(1)} minutes
+                  </Typography>
+
+                  {/* Timer Section */}
+                  {timeRemaining !== null ? (
+                    <Box
+                      sx={{
+                        mt: 3,
+                        p: 3,
+                        bgcolor: "background.default",
+                        borderRadius: 2,
+                        textAlign: "center",
+                      }}
+                    >
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          fontWeight: "bold",
+                          fontFamily: "monospace",
+                          color:
+                            timeRemaining === 0
+                              ? "success.main"
+                              : "text.primary",
+                        }}
+                      >
+                        {formatTime(timeRemaining)}
+                      </Typography>
+                      {timeRemaining > 0 && (
+                        <LinearProgress
+                          variant="determinate"
+                          value={
+                            ((result * 60 - timeRemaining) / (result * 60)) *
+                            100
+                          }
+                          sx={{ mt: 2, mb: 2, height: 8, borderRadius: 1 }}
+                        />
+                      )}
+                      {timeRemaining === 0 ? (
+                        <Typography
+                          variant="h6"
+                          sx={{ mt: 2, color: "success.main" }}
+                        >
+                          Session Complete! 🎉
+                        </Typography>
+                      ) : (
+                        <Box sx={{ mt: 2, display: "flex", gap: 1, justifyContent: "center" }}>
+                          {isPaused ? (
+                            <Button
+                              variant="contained"
+                              color="success"
+                              startIcon={<PlayArrow />}
+                              onClick={resumeTimer}
+                            >
+                              Resume
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="contained"
+                              color="warning"
+                              startIcon={<Pause />}
+                              onClick={pauseTimer}
+                            >
+                              Pause
+                            </Button>
+                          )}
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            startIcon={<Stop />}
+                            onClick={stopTimer}
+                          >
+                            Stop
+                          </Button>
+                        </Box>
+                      )}
+                    </Box>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="success"
+                      fullWidth
+                      onClick={startTimer}
+                      startIcon={<PlayArrow />}
+                      sx={{ mt: 3, py: 1.25, fontWeight: 600 }}
+                    >
+                      Start Session Timer
+                    </Button>
+                  )}
+                </>
               )}
 
               <Box sx={{ mt: 4, textAlign: "center" }}>
