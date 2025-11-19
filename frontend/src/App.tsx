@@ -145,7 +145,9 @@ function App() {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   return (
@@ -301,7 +303,14 @@ function App() {
                           Session Complete! 🎉
                         </Typography>
                       ) : (
-                        <Box sx={{ mt: 2, display: "flex", gap: 1, justifyContent: "center" }}>
+                        <Box
+                          sx={{
+                            mt: 2,
+                            display: "flex",
+                            gap: 1,
+                            justifyContent: "center",
+                          }}
+                        >
                           {isPaused ? (
                             <Button
                               variant="contained"
