@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && cd dist && git init && git add -A && git commit -m \"Deploy to GitHub Pages\" && git push -f https://github.com/CodyGrandt/StudySessionPlanner.git HEAD:gh-pages && cd .."
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
