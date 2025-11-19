@@ -8,6 +8,7 @@ import {
   Button,
   CircularProgress,
   Container,
+  Link,
 } from "@mui/material";
 import { evaluate } from "./fuzzy/engine";
 
@@ -135,6 +136,24 @@ function App() {
                 Recommended Duration: {result.toFixed(1)} minutes
               </Typography>
             )}
+
+            <Box sx={{ mt: 4, textAlign: "center" }}>
+              <Typography variant="body2" color="text.secondary">
+                Have feedback?{" "}
+                <Link
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSfki1-8ayWcOCHzUlXwT20-H-Weiv5HxBk3jPV-ABvkv_ENUA/viewform"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    color: "primary.main",
+                    textDecoration: "none",
+                    "&:hover": { textDecoration: "underline" },
+                  }}
+                >
+                  Let us know!
+                </Link>
+              </Typography>
+            </Box>
           </CardContent>
         </Card>
       </Container>
